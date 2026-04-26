@@ -20,6 +20,9 @@ function CustomerList() {
       <button onClick={() => navigate("/add")}>
         + Add Customer
       </button>
+      <button onClick={() => navigate("/bulkUpload")}>
+        + Bulk Upload
+      </button>
 
       <table border="1" cellPadding="10" style={{ marginTop: "20px", width: "100%" }}>
         <thead>
