@@ -8,7 +8,6 @@ function CustomerEdit() {
 
   const [customer, setCustomer] = useState({
     name: "",
-    email: "",
     dateOfBirth: "",
     nic: "",
   });
@@ -29,7 +28,6 @@ function CustomerEdit() {
         // Basic fields
         setCustomer({
           name: data.name,
-          email: data.email,
           dateOfBirth: data.dob,
           nic: data.nic,
         });
@@ -41,7 +39,9 @@ function CustomerEdit() {
         setAddresses(
           data.addresses?.map((a) => ({
             line: a.addressLine,
-          })) || [{ line: "" }]
+            cityName: a.cityName || "",
+            countryName: a.countryName || "",
+          })) || [{ line: "", cityName: "", countryName: "" }]
         );
 
         // Family members
@@ -83,14 +83,14 @@ function CustomerEdit() {
   // ----------------------------
   // ADDRESSES
   // ----------------------------
-  const handleAddressChange = (index, value) => {
+  const handleAddressChange = (index, field, value) => {
     const updated = [...addresses];
-    updated[index].line = value;
+    updated[index][field] = value;
     setAddresses(updated);
   };
 
   const addAddress = () =>
-    setAddresses([...addresses, { line: "" }]);
+    setAddresses([...addresses, { line: "", cityName: "", countryName: "" }]);
 
   const removeAddress = (index) => {
     const updated = addresses.filter((_, i) => i !== index);
@@ -123,7 +123,6 @@ function CustomerEdit() {
       name: customer.name,
       dob: customer.dateOfBirth,
       nic: customer.nic,
-      email: customer.email,
       mobiles: mobiles
         .filter((m) => m.trim() !== "")
         .map((m) => ({ mobile: m })),
@@ -132,6 +131,8 @@ function CustomerEdit() {
         .filter((a) => a.line.trim() !== "")
         .map((a) => ({
           addressLine: a.line,
+          cityName: a.cityName ? a.cityName.trim() : "",
+          countryName: a.countryName ? a.countryName.trim() : "",
         })),
 
       familyMemberIds: selectedFamily.map((id) => Number(id)),
@@ -166,14 +167,6 @@ function CustomerEdit() {
           onChange={handleChange}
           placeholder="Name"
         />
-        <input
-          type="email"
-          name="email"
-          value={customer.email}
-          onChange={handleChange}
-          placeholder="Email"
-        />
-
         <input
           type="date"
           name="dateOfBirth"
@@ -214,8 +207,23 @@ function CustomerEdit() {
             <input
               value={a.line}
               onChange={(e) =>
-                handleAddressChange(i, e.target.value)
+                handleAddressChange(i, "line", e.target.value)
               }
+              placeholder="Address"
+            />
+            <input
+              value={a.cityName || ""}
+              onChange={(e) =>
+                handleAddressChange(i, "cityName", e.target.value)
+              }
+              placeholder="City"
+            />
+            <input
+              value={a.countryName || ""}
+              onChange={(e) =>
+                handleAddressChange(i, "countryName", e.target.value)
+              }
+              placeholder="Country"
             />
             <button type="button" onClick={() => removeAddress(i)}>
               Remove

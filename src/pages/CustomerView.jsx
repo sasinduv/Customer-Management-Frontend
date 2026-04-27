@@ -34,7 +34,6 @@ function CustomerView() {
       <div>
         <p><strong>ID:</strong> {customer.id}</p>
         <p><strong>Name:</strong> {customer.name}</p>
-        <p><strong>Email:</strong> {customer.email}</p>
         <p><strong>NIC:</strong> {customer.nic}</p>
         <p><strong>Date of Birth:</strong> {customer.dob}</p>
       </div>
@@ -56,7 +55,10 @@ function CustomerView() {
       {customer.addresses && customer.addresses.length > 0 ? (
         <ul>
           {customer.addresses.map((a, index) => (
-            <li key={index}>{a.addressLine}</li>
+            <li key={index}>
+              {a.addressLine}
+              {(a.cityName || a.countryName) ? ` - ${a.cityName || ""}${a.cityName && a.countryName ? ", " : ""}${a.countryName || ""}` : ""}
+            </li>
           ))}
         </ul>
       ) : (
@@ -69,7 +71,7 @@ function CustomerView() {
         <ul>
           {customer.familyMembers.map((f, index) => (
             <li key={index}>
-              {f.name} ({f.nic})
+              {f.memberName} - {f.relation}
             </li>
           ))}
         </ul>

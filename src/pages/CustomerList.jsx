@@ -29,7 +29,6 @@ function CustomerList() {
           <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Email</th>
             <th>NIC</th>
             <th>Date of Birth</th>
             <th>Actions</th>
@@ -39,14 +38,13 @@ function CustomerList() {
         <tbody>
           {customers.length === 0 ? (
             <tr>
-              <td colSpan="6">No customers found</td>
+              <td colSpan="5">No customers found</td>
             </tr>
           ) : (
             customers.map((c) => (
               <tr key={c.id}>
                 <td>{c.id}</td>
                 <td>{c.name}</td>
-                <td>{c.email}</td>
                 <td>{c.nic}</td>
                 <td>{c.dob}</td>
 

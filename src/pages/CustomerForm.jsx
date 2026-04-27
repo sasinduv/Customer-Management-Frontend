@@ -8,7 +8,6 @@ function CustomerForm() {
   // Main customer fields
   const [customer, setCustomer] = useState({
     name: "",
-    email: "",
     dateOfBirth: "",
     nic: "",
   });
@@ -16,12 +15,13 @@ function CustomerForm() {
   // Dynamic fields
   const [mobiles, setMobiles] = useState([""]);
   const [addresses, setAddresses] = useState([
-    { line: "", city: "", country: "" },
+    { line: "", cityName: "", countryName: "" },
   ]);
 
   // Family members
   const [allCustomers, setAllCustomers] = useState([]);
   const [selectedFamily, setSelectedFamily] = useState([]);
+  const [familyNicSearch, setFamilyNicSearch] = useState("");
 
   // Load existing customers for family selection
   useEffect(() => {
@@ -29,6 +29,19 @@ function CustomerForm() {
       .then((res) => setAllCustomers(res.data))
       .catch((err) => console.error(err));
   }, []);
+
+  useEffect(() => {
+    if (familyNicSearch.trim() === "") {
+      API.get("/customers")
+        .then((res) => setAllCustomers(res.data))
+        .catch((err) => console.error(err));
+      return;
+    }
+
+    API.get(`/customers/search?nic=${encodeURIComponent(familyNicSearch)}`)
+      .then((res) => setAllCustomers(res.data))
+      .catch((err) => console.error(err));
+  }, [familyNicSearch]);
 
   // ----------------------------
   // Handle basic input
@@ -60,7 +73,7 @@ function CustomerForm() {
   };
 
   const addAddress = () => {
-    setAddresses([...addresses, { line: "", city: "", country: "" }]);
+    setAddresses([...addresses, { line: "", cityName: "", countryName: "" }]);
   };
 
   // ----------------------------
@@ -89,8 +102,7 @@ function CustomerForm() {
     name: customer.name,
     dob: customer.dateOfBirth,
     nic: customer.nic,
-    email: customer.email,
-    
+
     mobiles: mobiles
       .filter((m) => m.trim() !== "")
       .map((m) => ({ mobile: m })),
@@ -99,7 +111,9 @@ function CustomerForm() {
     addresses: addresses
       .filter((a) => a.line.trim() !== "")
       .map((a) => ({
-        addressLine: a.line
+        addressLine: a.line,
+        cityName: a.cityName ? a.cityName.trim() : "",
+        countryName: a.countryName ? a.countryName.trim() : ""
       })),
 
     
@@ -131,17 +145,6 @@ function CustomerForm() {
             type="text"
             name="name"
             value={customer.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={customer.email}
             onChange={handleChange}
             required
           />
@@ -198,21 +201,23 @@ function CustomerForm() {
               onChange={(e) =>
                 handleAddressChange(index, "line", e.target.value)
               }
+              style={{ marginBottom: "5px", display: "block" }}
             />
             <input
               type="text"
               placeholder="City"
-              value={addr.city}
+              value={addr.cityName || ""}
               onChange={(e) =>
-                handleAddressChange(index, "city", e.target.value)
+                handleAddressChange(index, "cityName", e.target.value)
               }
+              style={{ marginBottom: "5px", display: "block" }}
             />
             <input
               type="text"
               placeholder="Country"
-              value={addr.country}
+              value={addr.countryName || ""}
               onChange={(e) =>
-                handleAddressChange(index, "country", e.target.value)
+                handleAddressChange(index, "countryName", e.target.value)
               }
             />
           </div>
@@ -223,6 +228,13 @@ function CustomerForm() {
 
         {/* FAMILY MEMBERS */}
         <h4>Family Members</h4>
+        <input
+          type="text"
+          placeholder="Search family customer by NIC"
+          value={familyNicSearch}
+          onChange={(e) => setFamilyNicSearch(e.target.value)}
+          style={{ marginBottom: "10px", display: "block" }}
+        />
         <select multiple onChange={handleFamilySelect}>
           {allCustomers.map((c) => (
             <option key={c.id} value={c.id}>
